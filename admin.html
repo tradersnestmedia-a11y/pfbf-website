@@ -1,0 +1,510 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFBF - Enhanced Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { color: #1e3a8a; text-align: center; margin-bottom: 30px; }
+        h2 { color: #1e3a8a; margin: 20px 0 15px 0; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; }
+        .login-area, .admin-nav { text-align: center; margin-bottom: 30px; }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        .delete-btn { background: #ef4444; }
+        .delete-btn:hover { background: #dc2626; }
+        .item-card {
+            background: #f3f4f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .item-card img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .media-links {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .media-links a {
+            display: inline-block;
+            margin-right: 15px;
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .media-links a:hover { text-decoration: underline; }
+        .error { color: red; text-align: center; margin-top: 10px; }
+        .nav-btn {
+            background: #1e3a8a;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1e3a8a;
+        }
+        .form-group small {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .preview-img {
+            max-width: 100px;
+            margin: 10px 0;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .admin-nav button { display: block; width: 100%; margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginView">
+            <h1>🔐 PFBF Admin Login</h1>
+            <div class="login-area">
+                <input type="password" id="adminPassword" placeholder="Enter Password">
+                <button onclick="checkLogin()">Login</button>
+                <div id="loginError" class="error"></div>
+            </div>
+        </div>
+        
+        <div id="adminView" style="display:none;">
+            <h1>✝️ PFBF Enhanced Admin Panel</h1>
+            <div class="admin-nav">
+                <button class="nav-btn" onclick="showSection('prayers')">🙏 Prayer Requests</button>
+                <button class="nav-btn" onclick="showSection('sermons')">🎧 Sermons</button>
+                <button class="nav-btn" onclick="showSection('events')">📅 Events</button>
+                <button class="nav-btn" onclick="showSection('testimonies')">🙌 Testimonies</button>
+            </div>
+            
+            <div id="prayersSection">
+                <h2>🙏 Prayer Requests</h2>
+                <div id="prayersList"></div>
+            </div>
+            
+            <div id="sermonsSection" style="display:none;">
+                <h2>🎧 Manage Sermons</h2>
+                <button onclick="showAddModal('sermon')">+ Add New Sermon</button>
+                <div id="sermonsList"></div>
+            </div>
+            
+            <div id="eventsSection" style="display:none;">
+                <h2>📅 Manage Events</h2>
+                <button onclick="showAddModal('event')">+ Add New Event</button>
+                <div id="eventsList"></div>
+            </div>
+            
+            <div id="testimoniesSection" style="display:none;">
+                <h2>🙌 Manage Testimonies</h2>
+                <button onclick="showAddModal('testimony')">+ Add New Testimony</button>
+                <div id="testimoniesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add Item</h3>
+            <div id="modalFields"></div>
+            <button onclick="saveItem()">Save</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const PASSWORD = "pfbf2024";
+        let currentType = null;
+        let editId = null;
+        
+        function checkLogin() {
+            const pwd = document.getElementById('adminPassword').value;
+            if (pwd === PASSWORD) {
+                document.getElementById('loginView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                loadPrayers();
+                loadSermons();
+                loadEvents();
+                loadTestimonies();
+            } else {
+                document.getElementById('loginError').innerText = 'Wrong password!';
+            }
+        }
+        
+        function showSection(section) {
+            const sections = ['prayers', 'sermons', 'events', 'testimonies'];
+            sections.forEach(s => {
+                document.getElementById(s + 'Section').style.display = 'none';
+            });
+            document.getElementById(section + 'Section').style.display = 'block';
+            if (section === 'prayers') loadPrayers();
+            if (section === 'sermons') loadSermons();
+            if (section === 'events') loadEvents();
+            if (section === 'testimonies') loadTestimonies();
+        }
+        
+        function loadPrayers() {
+            let prayers = JSON.parse(localStorage.getItem('pfbf_prayers') || '[]');
+            const container = document.getElementById('prayersList');
+            if (prayers.length === 0) {
+                container.innerHTML = '<p>No prayer requests yet.</p>';
+                return;
+            }
+            container.innerHTML = prayers.reverse().map(p => `
+                <div class="item-card">
+                    <strong>${p.name}</strong> (${p.email})<br>
+                    <small>${new Date(p.date).toLocaleString()}</small>
+                    <p style="margin-top:10px;">${p.message}</p>
+                    <button class="delete-btn" onclick="deletePrayer(${p.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        function loadSermons() {
+            let sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+            const container = document.getElementById('sermonsList');
+            if (sermons.length === 0) {
+                container.innerHTML = '<p>No sermons yet. Add your first sermon!</p>';
+                return;
+            }
+            container.innerHTML = sermons.map(s => `
+                <div class="item-card">
+                    <strong>${s.title}</strong> - ${s.speaker}<br>
+                    <small>${s.date}</small>
+                    <p>${s.description || ''}</p>
+                    ${s.videoUrl ? `<div class="media-links">🎥 <a href="${s.videoUrl}" target="_blank">Watch Video</a></div>` : ''}
+                    ${s.audioUrl ? `<div class="media-links">🎵 <a href="${s.audioUrl}" target="_blank">Listen to Audio</a></div>` : ''}
+                    ${s.imageUrl ? `<img src="${s.imageUrl}" style="max-width:200px; margin-top:10px;" onerror="this.style.display='none'">` : ''}
+                    <div class="media-links">
+                        <button onclick="editItem('sermon', ${s.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteSermon(${s.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function loadEvents() {
+            let events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+            const container = document.getElementById('eventsList');
+            if (events.length === 0) {
+                container.innerHTML = '<p>No events yet. Add your first event!</p>';
+                return;
+            }
+            container.innerHTML = events.map(e => `
+                <div class="item-card">
+                    <strong>${e.title}</strong><br>
+                    📅 ${e.date} | ⏰ ${e.time}<br>
+                    📍 ${e.location}<br>
+                    <p>${e.description || ''}</p>
+                    ${e.imageUrl ? `<img src="${e.imageUrl}" style="max-width:200px; margin-top:10px;" onerror="this.style.display='none'">` : ''}
+                    ${e.videoUrl ? `<div class="media-links">🎥 <a href="${e.videoUrl}" target="_blank">Event Video/Promotion</a></div>` : ''}
+                    <div class="media-links">
+                        <button onclick="editItem('event', ${e.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteEvent(${e.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function loadTestimonies() {
+            let testimonies = JSON.parse(localStorage.getItem('pfbf_testimonies') || '[]');
+            const container = document.getElementById('testimoniesList');
+            if (testimonies.length === 0) {
+                container.innerHTML = '<p>No testimonies yet. Add your first testimony!</p>';
+                return;
+            }
+            container.innerHTML = testimonies.map(t => `
+                <div class="item-card">
+                    <strong>${t.name}</strong>
+                    <p>"${t.testimony}"</p>
+                    ${t.imageUrl ? `<img src="${t.imageUrl}" style="max-width:100px; margin-top:10px;" onerror="this.style.display='none'">` : ''}
+                    <div class="media-links">
+                        <button onclick="editItem('testimony', ${t.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteTestimony(${t.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function deletePrayer(id) {
+            let prayers = JSON.parse(localStorage.getItem('pfbf_prayers') || '[]');
+            prayers = prayers.filter(p => p.id !== id);
+            localStorage.setItem('pfbf_prayers', JSON.stringify(prayers));
+            loadPrayers();
+        }
+        
+        function deleteSermon(id) {
+            let sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+            sermons = sermons.filter(s => s.id !== id);
+            localStorage.setItem('pfbf_sermons', JSON.stringify(sermons));
+            loadSermons();
+        }
+        
+        function deleteEvent(id) {
+            let events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+            events = events.filter(e => e.id !== id);
+            localStorage.setItem('pfbf_events', JSON.stringify(events));
+            loadEvents();
+        }
+        
+        function deleteTestimony(id) {
+            let testimonies = JSON.parse(localStorage.getItem('pfbf_testimonies') || '[]');
+            testimonies = testimonies.filter(t => t.id !== id);
+            localStorage.setItem('pfbf_testimonies', JSON.stringify(testimonies));
+            loadTestimonies();
+        }
+        
+        function editItem(type, id) {
+            currentType = type;
+            editId = id;
+            let item = null;
+            
+            if (type === 'sermon') {
+                let items = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+                item = items.find(i => i.id === id);
+                document.getElementById('modalTitle').innerText = 'Edit Sermon';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Title</label><input type="text" id="title" placeholder="Title" value="${escapeHtml(item.title)}"></div>
+                    <div class="form-group"><label>Speaker</label><input type="text" id="speaker" placeholder="Speaker" value="${escapeHtml(item.speaker)}"></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="date" value="${item.date}"></div>
+                    <div class="form-group"><label>Description</label><textarea id="description" placeholder="Description">${escapeHtml(item.description || '')}</textarea></div>
+                    <div class="form-group"><label>🎥 YouTube/Video Link</label><input type="url" id="videoUrl" placeholder="https://youtube.com/..." value="${escapeHtml(item.videoUrl || '')}"><small>Paste YouTube or Vimeo link</small></div>
+                    <div class="form-group"><label>🎵 Audio Link (Sermon Recording)</label><input type="url" id="audioUrl" placeholder="https://..." value="${escapeHtml(item.audioUrl || '')}"><small>Link to MP3 or sermon audio</small></div>
+                    <div class="form-group"><label>🖼️ Image Link</label><input type="url" id="imageUrl" placeholder="https://..." value="${escapeHtml(item.imageUrl || '')}"><small>Image for sermon (optional)</small></div>
+                `;
+            } else if (type === 'event') {
+                let items = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+                item = items.find(i => i.id === id);
+                document.getElementById('modalTitle').innerText = 'Edit Event';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Event Title</label><input type="text" id="title" placeholder="Title" value="${escapeHtml(item.title)}"></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="date" value="${item.date}"></div>
+                    <div class="form-group"><label>Time</label><input type="text" id="time" placeholder="Time" value="${escapeHtml(item.time)}"></div>
+                    <div class="form-group"><label>Location</label><input type="text" id="location" placeholder="Location" value="${escapeHtml(item.location)}"></div>
+                    <div class="form-group"><label>Description</label><textarea id="description" placeholder="Description">${escapeHtml(item.description || '')}</textarea></div>
+                    <div class="form-group"><label>🎥 Event Video/Promo Link</label><input type="url" id="videoUrl" placeholder="https://youtube.com/..." value="${escapeHtml(item.videoUrl || '')}"><small>Promotional video for the event</small></div>
+                    <div class="form-group"><label>🖼️ Event Image/Flyer Link</label><input type="url" id="imageUrl" placeholder="https://..." value="${escapeHtml(item.imageUrl || '')}"><small>Upload flyer image to postimage.org and paste link</small></div>
+                `;
+            } else if (type === 'testimony') {
+                let items = JSON.parse(localStorage.getItem('pfbf_testimonies') || '[]');
+                item = items.find(i => i.id === id);
+                document.getElementById('modalTitle').innerText = 'Edit Testimony';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Name</label><input type="text" id="name" placeholder="Name" value="${escapeHtml(item.name)}"></div>
+                    <div class="form-group"><label>Testimony</label><textarea id="testimony" placeholder="Testimony">${escapeHtml(item.testimony)}</textarea></div>
+                    <div class="form-group"><label>🖼️ Person's Photo (Optional)</label><input type="url" id="imageUrl" placeholder="https://..." value="${escapeHtml(item.imageUrl || '')}"><small>Link to photo (optional)</small></div>
+                `;
+            }
+            document.getElementById('itemModal').style.display = 'block';
+        }
+        
+        function showAddModal(type) {
+            currentType = type;
+            editId = null;
+            if (type === 'sermon') {
+                document.getElementById('modalTitle').innerText = 'Add Sermon';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Title</label><input type="text" id="title" placeholder="Title"></div>
+                    <div class="form-group"><label>Speaker</label><input type="text" id="speaker" placeholder="Speaker"></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="date"></div>
+                    <div class="form-group"><label>Description</label><textarea id="description" placeholder="Description"></textarea></div>
+                    <div class="form-group"><label>🎥 YouTube/Video Link</label><input type="url" id="videoUrl" placeholder="https://youtube.com/..."><small>Paste YouTube or Vimeo link</small></div>
+                    <div class="form-group"><label>🎵 Audio Link (Sermon Recording)</label><input type="url" id="audioUrl" placeholder="https://..."><small>Link to MP3 or sermon audio</small></div>
+                    <div class="form-group"><label>🖼️ Image Link</label><input type="url" id="imageUrl" placeholder="https://..."><small>Image for sermon (optional)</small></div>
+                `;
+            } else if (type === 'event') {
+                document.getElementById('modalTitle').innerText = 'Add Event';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Event Title</label><input type="text" id="title" placeholder="Title"></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="date"></div>
+                    <div class="form-group"><label>Time</label><input type="text" id="time" placeholder="Time"></div>
+                    <div class="form-group"><label>Location</label><input type="text" id="location" placeholder="Location"></div>
+                    <div class="form-group"><label>Description</label><textarea id="description" placeholder="Description"></textarea></div>
+                    <div class="form-group"><label>🎥 Event Video/Promo Link</label><input type="url" id="videoUrl" placeholder="https://youtube.com/..."><small>Promotional video for the event</small></div>
+                    <div class="form-group"><label>🖼️ Event Image/Flyer Link</label><input type="url" id="imageUrl" placeholder="https://..."><small>Upload flyer to postimage.org and paste link</small></div>
+                `;
+            } else if (type === 'testimony') {
+                document.getElementById('modalTitle').innerText = 'Add Testimony';
+                document.getElementById('modalFields').innerHTML = `
+                    <div class="form-group"><label>Name</label><input type="text" id="name" placeholder="Name"></div>
+                    <div class="form-group"><label>Testimony</label><textarea id="testimony" placeholder="Testimony"></textarea></div>
+                    <div class="form-group"><label>🖼️ Person's Photo (Optional)</label><input type="url" id="imageUrl" placeholder="https://..."><small>Link to photo (optional)</small></div>
+                `;
+            }
+            document.getElementById('itemModal').style.display = 'block';
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+            editId = null;
+        }
+        
+        function saveItem() {
+            if (currentType === 'sermon') {
+                let sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+                const sermon = {
+                    id: editId || Date.now(),
+                    title: document.getElementById('title').value,
+                    speaker: document.getElementById('speaker').value,
+                    date: document.getElementById('date').value,
+                    description: document.getElementById('description').value,
+                    videoUrl: document.getElementById('videoUrl').value,
+                    audioUrl: document.getElementById('audioUrl').value,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+                if (editId) {
+                    const index = sermons.findIndex(s => s.id === editId);
+                    sermons[index] = sermon;
+                } else {
+                    sermons.push(sermon);
+                }
+                localStorage.setItem('pfbf_sermons', JSON.stringify(sermons));
+                loadSermons();
+            } else if (currentType === 'event') {
+                let events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+                const event = {
+                    id: editId || Date.now(),
+                    title: document.getElementById('title').value,
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    location: document.getElementById('location').value,
+                    description: document.getElementById('description').value,
+                    videoUrl: document.getElementById('videoUrl').value,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+                if (editId) {
+                    const index = events.findIndex(e => e.id === editId);
+                    events[index] = event;
+                } else {
+                    events.push(event);
+                }
+                localStorage.setItem('pfbf_events', JSON.stringify(events));
+                loadEvents();
+            } else if (currentType === 'testimony') {
+                let testimonies = JSON.parse(localStorage.getItem('pfbf_testimonies') || '[]');
+                const testimony = {
+                    id: editId || Date.now(),
+                    name: document.getElementById('name').value,
+                    testimony: document.getElementById('testimony').value,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+                if (editId) {
+                    const index = testimonies.findIndex(t => t.id === editId);
+                    testimonies[index] = testimony;
+                } else {
+                    testimonies.push(testimony);
+                }
+                localStorage.setItem('pfbf_testimonies', JSON.stringify(testimonies));
+                loadTestimonies();
+            }
+            closeModal();
+            alert('Saved successfully!');
+        }
+        
+        // Initialize sample data with media examples
+        if (!localStorage.getItem('pfbf_sermons')) {
+            localStorage.setItem('pfbf_sermons', JSON.stringify([
+                { 
+                    id: 1, 
+                    title: "The Power of the Holy Spirit", 
+                    speaker: "Pastor Michael Thompson", 
+                    date: "2024-12-15", 
+                    description: "Discover the transformative power of the Holy Spirit in your life",
+                    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                    audioUrl: "",
+                    imageUrl: ""
+                }
+            ]));
+        }
+        if (!localStorage.getItem('pfbf_events')) {
+            localStorage.setItem('pfbf_events', JSON.stringify([
+                { 
+                    id: 1, 
+                    title: "Christmas Crusade 2024", 
+                    date: "2024-12-22", 
+                    time: "2:00 PM - 6:00 PM", 
+                    location: "Chirundu Border", 
+                    description: "Special cross-border Christmas celebration with worship, drama, and free meal distribution.",
+                    videoUrl: "",
+                    imageUrl: ""
+                }
+            ]));
+        }
+        if (!localStorage.getItem('pfbf_testimonies')) {
+            localStorage.setItem('pfbf_testimonies', JSON.stringify([
+                { id: 1, name: "John B.", testimony: "I was a truck driver passing through Chirundu when I gave my life to Christ. Now I serve God at every border I cross!", imageUrl: "" }
+            ]));
+        }
+        if (!localStorage.getItem('pfbf_prayers')) {
+            localStorage.setItem('pfbf_prayers', JSON.stringify([]));
+        }
+    </script>
+</body>
+</html>

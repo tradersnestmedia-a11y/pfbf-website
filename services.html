@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFBF - Services | Chirundu Border Church</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            position: relative;
+            min-height: 100vh;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.postimg.cc/25MmdJ13/1781295199617-2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            opacity: 0.25;
+            z-index: -2;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo img { height: 50px; }
+        .logo-text h2 { font-size: 20px; color: #1e3a8a; margin: 0; }
+        .logo-text p { font-size: 12px; color: #4b5563; margin: 0; }
+        .nav-links { display: flex; list-style: none; gap: 25px; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: #111827; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: #2563eb; }
+        .page-header {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            margin: 40px 20px;
+            border-radius: 20px;
+        }
+        .page-header h1 { font-size: 48px; margin-bottom: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .section h2 {
+            color: #1e3a8a;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+            border-bottom: 3px solid #3b82f6;
+            display: inline-block;
+            width: auto;
+            padding-bottom: 10px;
+        }
+        .section-header { text-align: center; margin-bottom: 30px; }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        .item-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            transition: 0.3s;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .item-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .item-title { font-size: 18px; font-weight: bold; color: #1e3a8a; margin-bottom: 5px; }
+        .item-meta { color: #6b7280; font-size: 14px; margin-bottom: 10px; }
+        .item-image { width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 8px; margin: 10px 0; }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .media-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+        }
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; }
+            .page-header h1 { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="https://i.postimg.cc/25MmdJ13/1781295199617-2.jpg" alt="PFBF Logo">
+            <div class="logo-text"><h2>Power Filled Believer's Fellowship</h2><p>Chirundu Border, Zambia • Acts 1:8</p></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html" class="active">Services</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Our Services & Ministries</h1>
+        <p>Worship Services | Border Outreach | Prayer Meetings</p>
+    </div>
+    
+    <div class="container">
+        <div class="section">
+            <div class="section-header"><h2>🎧 All Sermons</h2></div>
+            <div id="allSermons" class="items-grid">Loading sermons...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header"><h2>📅 All Events</h2></div>
+            <div id="allEvents" class="items-grid">Loading events...</div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2024 Power Filled Believer's Fellowship - Chirundu, Zambia | Acts 1:8</p>
+    </div>
+    
+    <script>
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+        
+        function loadAllSermons() {
+            const sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+            const container = document.getElementById('allSermons');
+            if (sermons.length === 0) {
+                container.innerHTML = '<p>No sermons available yet. Check back soon!</p>';
+                return;
+            }
+            container.innerHTML = sermons.reverse().map(s => {
+                let videoHtml = '';
+                if (s.videoUrl) {
+                    const videoId = getYouTubeId(s.videoUrl);
+                    if (videoId) {
+                        videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+                    } else {
+                        videoHtml = `<a href="${s.videoUrl}" target="_blank" class="media-link">🎥 Watch Video</a>`;
+                    }
+                }
+                return `
+                    <div class="item-card">
+                        ${s.imageUrl ? `<img src="${s.imageUrl}" class="item-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
+                        <div class="item-title">${s.title}</div>
+                        <div class="item-meta">${s.speaker} | ${s.date}</div>
+                        <p>${s.description || ''}</p>
+                        ${videoHtml}
+                        ${s.audioUrl ? `<a href="${s.audioUrl}" target="_blank" class="media-link">🎵 Listen to Audio</a>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function loadAllEvents() {
+            const events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+            const container = document.getElementById('allEvents');
+            if (events.length === 0) {
+                container.innerHTML = '<p>No upcoming events. Check back soon!</p>';
+                return;
+            }
+            container.innerHTML = events.reverse().map(e => {
+                let videoHtml = '';
+                if (e.videoUrl) {
+                    const videoId = getYouTubeId(e.videoUrl);
+                    if (videoId) {
+                        videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+                    } else {
+                        videoHtml = `<a href="${e.videoUrl}" target="_blank" class="media-link">🎥 Watch Promo</a>`;
+                    }
+                }
+                return `
+                    <div class="item-card">
+                        ${e.imageUrl ? `<img src="${e.imageUrl}" class="item-image" onerror="this.style.display='none'" alt="${e.title}">` : ''}
+                        <div class="item-title">${e.title}</div>
+                        <div class="item-meta">📅 ${e.date} | ⏰ ${e.time} | 📍 ${e.location}</div>
+                        <p>${e.description || ''}</p>
+                        ${videoHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        loadAllSermons();
+        loadAllEvents();
+        
+        // Refresh every 30 seconds
+        setInterval(() => {
+            loadAllSermons();
+            loadAllEvents();
+        }, 30000);
+    </script>
+</body>
+</html>
+
