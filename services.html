@@ -182,43 +182,72 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
         
-        function loadAllSermons() {
-            const sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+                async function loadAllSermons() {
             const container = document.getElementById('allSermons');
-            if (sermons.length === 0) {
-                container.innerHTML = '<p>No sermons available yet. Check back soon!</p>';
+            if (!container) return;
+            
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading sermons...</div>';
+            
+            const sermons = await loadSermonsFromCloud();
+            if (!sermons || sermons.length === 0) {
+                container.innerHTML = '<p>No sermons available yet.</p>';
                 return;
             }
-            container.innerHTML = sermons.reverse().map(s => {
+            container.innerHTML = sermons.map(s => {
                 let videoHtml = '';
-                if (s.videoUrl) {
-                    const videoId = getYouTubeId(s.videoUrl);
+                if (s.video_url) {
+                    const videoId = getYouTubeId(s.video_url);
                     if (videoId) {
                         videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
                     } else {
-                        videoHtml = `<a href="${s.videoUrl}" target="_blank" class="media-link">🎥 Watch Video</a>`;
+                        videoHtml = `<a href="${s.video_url}" target="_blank" class="media-link">🎥 Watch Video</a>`;
                     }
                 }
                 return `
                     <div class="item-card">
-                        ${s.imageUrl ? `<img src="${s.imageUrl}" class="item-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
+                        ${s.image_url ? `<img src="${s.image_url}" class="item-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
                         <div class="item-title">${s.title}</div>
                         <div class="item-meta">${s.speaker} | ${s.date}</div>
                         <p>${s.description || ''}</p>
                         ${videoHtml}
-                        ${s.audioUrl ? `<a href="${s.audioUrl}" target="_blank" class="media-link">🎵 Listen to Audio</a>` : ''}
+                        ${s.audio_url ? `<a href="${s.audio_url}" target="_blank" class="media-link">🎵 Listen to Audio</a>` : ''}
                     </div>
                 `;
             }).join('');
         }
         
-        function loadAllEvents() {
-            const events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+        async function loadAllEvents() {
             const container = document.getElementById('allEvents');
-            if (events.length === 0) {
-                container.innerHTML = '<p>No upcoming events. Check back soon!</p>';
+            if (!container) return;
+            
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading events...</div>';
+            
+            const events = await loadEventsFromCloud();
+            if (!events || events.length === 0) {
+                container.innerHTML = '<p>No upcoming events.</p>';
                 return;
             }
+            container.innerHTML = events.map(e => {
+                let videoHtml = '';
+                if (e.video_url) {
+                    const videoId = getYouTubeId(e.video_url);
+                    if (videoId) {
+                        videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+                    } else {
+                        videoHtml = `<a href="${e.video_url}" target="_blank" class="media-link">🎥 Watch Promo</a>`;
+                    }
+                }
+                return `
+                    <div class="item-card">
+                        ${e.image_url ? `<img src="${e.image_url}" class="item-image" onerror="this.style.display='none'" alt="${e.title}">` : ''}
+                        <div class="item-title">${e.title}</div>
+                        <div class="item-meta">📅 ${e.date} | ⏰ ${e.time} | 📍 ${e.location}</div>
+                        <p>${e.description || ''}</p>
+                        ${videoHtml}
+                    </div>
+                `;
+            }).join('');
+        }
             container.innerHTML = events.reverse().map(e => {
                 let videoHtml = '';
                 if (e.videoUrl) {
@@ -250,6 +279,9 @@
             loadAllEvents();
         }, 30000);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
 </body>
 </html>
+
 

@@ -355,60 +355,66 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
         
-        function loadSermons() {
-            const sermons = JSON.parse(localStorage.getItem('pfbf_sermons') || '[]');
+                async function loadSermons() {
             const container = document.getElementById('sermonsContainer');
             if (!container) return;
-            if (sermons.length === 0) {
+            
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading sermons from cloud...</div>';
+            
+            const sermons = await loadSermonsFromCloud();
+            if (!sermons || sermons.length === 0) {
                 container.innerHTML = '<p>No sermons available yet. Check back soon!</p>';
                 return;
             }
-            const latestSermons = sermons.slice(-3).reverse();
+            const latestSermons = sermons.slice(0, 3);
             container.innerHTML = latestSermons.map(s => {
                 let videoHtml = '';
-                if (s.videoUrl) {
-                    const videoId = getYouTubeId(s.videoUrl);
+                if (s.video_url) {
+                    const videoId = getYouTubeId(s.video_url);
                     if (videoId) {
                         videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
                     } else {
-                        videoHtml = `<div class="media-links"><a href="${s.videoUrl}" target="_blank" class="media-link">🎥 Watch Video</a></div>`;
+                        videoHtml = `<div class="media-links"><a href="${s.video_url}" target="_blank" class="media-link">🎥 Watch Video</a></div>`;
                     }
                 }
                 return `
                     <div class="sermon-card">
-                        ${s.imageUrl ? `<img src="${s.imageUrl}" class="sermon-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
+                        ${s.image_url ? `<img src="${s.image_url}" class="sermon-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
                         <div class="sermon-title">${s.title}</div>
                         <div class="sermon-speaker">${s.speaker} | ${s.date}</div>
                         <p>${s.description || ''}</p>
                         ${videoHtml}
-                        ${s.audioUrl ? `<div class="media-links"><a href="${s.audioUrl}" target="_blank" class="media-link">🎵 Listen to Audio</a></div>` : ''}
+                        ${s.audio_url ? `<div class="media-links"><a href="${s.audio_url}" target="_blank" class="media-link">🎵 Listen to Audio</a></div>` : ''}
                     </div>
                 `;
             }).join('');
         }
         
-        function loadEvents() {
-            const events = JSON.parse(localStorage.getItem('pfbf_events') || '[]');
+        async function loadEvents() {
             const container = document.getElementById('eventsContainer');
             if (!container) return;
-            if (events.length === 0) {
+            
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading events from cloud...</div>';
+            
+            const events = await loadEventsFromCloud();
+            if (!events || events.length === 0) {
                 container.innerHTML = '<p>No upcoming events. Check back soon!</p>';
                 return;
             }
-            const upcomingEvents = events.slice(-3).reverse();
+            const upcomingEvents = events.slice(0, 3);
             container.innerHTML = upcomingEvents.map(e => {
                 let videoHtml = '';
-                if (e.videoUrl) {
-                    const videoId = getYouTubeId(e.videoUrl);
+                if (e.video_url) {
+                    const videoId = getYouTubeId(e.video_url);
                     if (videoId) {
                         videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
                     } else {
-                        videoHtml = `<div class="media-links"><a href="${e.videoUrl}" target="_blank" class="media-link">🎥 Watch Promo</a></div>`;
+                        videoHtml = `<div class="media-links"><a href="${e.video_url}" target="_blank" class="media-link">🎥 Watch Promo</a></div>`;
                     }
                 }
                 return `
                     <div class="event-card">
-                        ${e.imageUrl ? `<img src="${e.imageUrl}" class="sermon-image" onerror="this.style.display='none'" alt="${e.title}">` : ''}
+                        ${e.image_url ? `<img src="${e.image_url}" class="sermon-image" onerror="this.style.display='none'" alt="${e.title}">` : ''}
                         <div class="event-title">${e.title}</div>
                         <div class="event-time">📅 ${e.date} | ⏰ ${e.time}</div>
                         <div class="event-time">📍 ${e.location}</div>
@@ -419,14 +425,26 @@
             }).join('');
         }
         
-        function loadTestimonies() {
-            const testimonies = JSON.parse(localStorage.getItem('pfbf_testimonies') || '[]');
+        async function loadTestimonies() {
             const container = document.getElementById('testimoniesContainer');
             if (!container) return;
-            if (testimonies.length === 0) {
+            
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading testimonies from cloud...</div>';
+            
+            const testimonies = await loadTestimoniesFromCloud();
+            if (!testimonies || testimonies.length === 0) {
                 container.innerHTML = '<p>No testimonies yet. Share yours!</p>';
                 return;
             }
+            const recentTestimonies = testimonies.slice(0, 3);
+            container.innerHTML = recentTestimonies.map(t => `
+                <div class="testimonial-card">
+                    ${t.image_url ? `<img src="${t.image_url}" class="testimonial-image" onerror="this.style.display='none'" alt="${t.name}">` : ''}
+                    <div class="testimonial-text">"${t.testimony}"</div>
+                    <div class="testimonial-author">- ${t.name}</div>
+                </div>
+            `).join('');
+        }
             const recentTestimonies = testimonies.slice(-3).reverse();
             container.innerHTML = recentTestimonies.map(t => `
                 <div class="testimonial-card">
@@ -510,5 +528,8 @@
             loadTestimonies();
         }, 30000);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
 </body>
 </html>
+
