@@ -2,8 +2,11 @@
 const SUPABASE_URL = 'https://ejxzbxlvqougraxuatsq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_CDHrNuD2u0O5uf3QWYLJ5g_CaYIz4WS';
 
-// Initialize Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase (only once)
+if (typeof window.supabaseClient === 'undefined') {
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+const supabase = window.supabaseClient;
 
 // Function to load sermons from cloud
 async function loadSermonsFromCloud() {
