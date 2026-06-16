@@ -3,533 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFBF - Power Filled Believer's Fellowship | Chirundu Border Church</title>
+    <title>PFBF - Power Filled Believer's Fellowship</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            position: relative;
-            min-height: 100vh;
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://i.postimg.cc/25MmdJ13/1781295199617-2.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            opacity: 0.25;
-            z-index: -2;
-        }
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        body { font-family: Arial, sans-serif; background: #f8fafc; }
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { display: flex; align-items: center; gap: 15px; }
         .logo img { height: 50px; }
-        .logo-text h2 { font-size: 20px; color: #1e3a8a; margin: 0; }
-        .logo-text p { font-size: 12px; color: #4b5563; margin: 0; }
-        .nav-links { display: flex; list-style: none; gap: 25px; margin: 0; padding: 0; }
-        .nav-links a { text-decoration: none; color: #111827; font-weight: 500; transition: 0.3s; }
-        .nav-links a:hover, .nav-links a.active { color: #2563eb; }
-        .hero {
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            text-align: center;
-            padding: 60px 20px;
-            margin: 40px 20px 20px 20px;
-            border-radius: 20px;
-        }
-        .hero h1 { font-size: 48px; margin-bottom: 20px; }
-        .hero .verse {
-            font-size: 22px;
-            font-style: italic;
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
-            display: inline-block;
-        }
-        .btn {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-            margin: 10px;
-        }
-        .btn-outline { background: transparent; border: 2px solid white; }
-        .btn-small { display: inline-block; background: #2563eb; color: white; padding: 8px 20px; text-decoration: none; border-radius: 5px; font-size: 14px; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .countdown-section {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-        .countdown-title { text-align: center; color: #1e3a8a; font-size: 20px; margin-bottom: 15px; font-weight: bold; }
-        .countdown-timer { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .countdown-box {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            min-width: 80px;
-            text-align: center;
-        }
-        .countdown-number { font-size: 28px; font-weight: bold; display: block; }
-        .countdown-label { font-size: 11px; text-transform: uppercase; margin-top: 5px; display: block; opacity: 0.9; }
-        .next-service-info { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; color: #4b5563; font-size: 14px; }
-        .live-badge {
-            background: #ef4444;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-        .section h2 {
-            color: #1e3a8a;
-            margin-bottom: 30px;
-            font-size: 28px;
-            text-align: center;
-            border-bottom: 3px solid #3b82f6;
-            display: inline-block;
-            width: auto;
-            padding-bottom: 10px;
-        }
-        .section-header { text-align: center; margin-bottom: 30px; }
-        .sermons-grid, .events-grid, .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-        .sermon-card, .event-card, .testimonial-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            transition: 0.3s;
-            border-left: 4px solid #3b82f6;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .sermon-card:hover, .event-card:hover, .testimonial-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .sermon-title, .event-title { font-size: 18px; font-weight: bold; color: #1e3a8a; margin-bottom: 5px; }
-        .sermon-speaker, .event-time { color: #6b7280; font-size: 14px; margin-bottom: 10px; }
-        .sermon-image, .event-image {
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-        .testimonial-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 10px auto;
-            display: block;
-            border: 3px solid #3b82f6;
-        }
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            margin: 15px 0;
-            border-radius: 8px;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .media-links { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .media-link {
-            display: inline-block;
-            padding: 8px 15px;
-            background: #3b82f6;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 13px;
-        }
-        .testimonial-text { font-style: italic; color: #374151; margin-bottom: 10px; line-height: 1.6; }
-        .testimonial-author { font-weight: bold; color: #1e3a8a; text-align: center; }
-        .service-times-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .service-times-list { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .service-time-item { text-align: center; }
-        .service-name { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-        .location-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 40px;
-        }
-        .footer {
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            text-align: center;
-            padding: 40px;
-            margin-top: 60px;
-        }
-        @media (max-width: 768px) {
-            .navbar { flex-direction: column; gap: 15px; }
-            .nav-links { flex-wrap: wrap; justify-content: center; }
-            .hero h1 { font-size: 32px; }
-            .sermons-grid, .events-grid, .testimonials-grid { grid-template-columns: 1fr; }
-        }
+        .nav-links { display: flex; list-style: none; gap: 25px; }
+        .nav-links a { text-decoration: none; color: #111827; font-weight: 500; }
+        .section { background: white; padding: 30px; margin: 20px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+        h1, h2 { color: #1e3a8a; }
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
+        .footer { background: #111827; color: white; text-align: center; padding: 40px; margin-top: 40px; }
+        .btn { display: inline-block; background: #2563eb; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo">
             <img src="https://i.postimg.cc/25MmdJ13/1781295199617-2.jpg" alt="PFBF Logo">
-            <div class="logo-text">
-                <h2>Power Filled Believer's Fellowship</h2>
-                <p>Chirundu Border, Zambia • Acts 1:8</p>
-            </div>
+            <div><h2>Power Filled Believer's Fellowship</h2><p>Chirundu Border, Zambia • Acts 1:8</p></div>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="services.html">Services</a></li>
             <li><a href="contact.html">Contact</a></li>
         </ul>
     </nav>
-    
-    <div class="hero">
-        <h1>Welcome to PFBF - Chirundu</h1>
-        <div class="verse">
-            "But you shall receive power when the Holy Spirit has come upon you;<br>
-            and you shall be witnesses to Me in Jerusalem, and in all Judea and Samaria,<br>
-            <strong>and to the end of the earth.</strong>"
-            <br><br>
-            <strong>— Acts 1:8</strong>
-        </div>
-        <p>Located at the border of Zambia & Zimbabwe - Reaching Nations with God's Power!</p>
-        <a href="services.html" class="btn">Join Us This Sunday</a>
-        <a href="contact.html" class="btn btn-outline">Find Our Location</a>
-    </div>
-    
-    <div class="countdown-section">
-        <div class="countdown-title">⏰ NEXT SERVICE COUNTDOWN</div>
-        <div class="countdown-timer">
-            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Days</span></div>
-            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Hours</span></div>
-            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutes</span></div>
-            <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Seconds</span></div>
-        </div>
-        <div class="next-service-info" id="nextServiceInfo">Next: Sunday Service - Sunday at 10:00 AM</div>
-        <div id="liveStatus"></div>
-    </div>
-    
+
     <div class="container">
-        <div class="location-banner">
-            <h3>📍 Strategically Located at Chirundu Border</h3>
-            <p>Zambia - Zimbabwe Border | Reaching Two Nations with One Gospel</p>
-        </div>
-        
         <div class="section">
-            <div class="section-header"><h2>🎧 Latest Sermons</h2></div>
-            <div id="sermonsContainer" class="sermons-grid">Loading sermons...</div>
-            <div style="text-align: center; margin-top: 20px;"><a href="services.html" class="btn-small">📖 View All Sermons →</a></div>
+            <h1>Welcome to PFBF - Chirundu</h1>
+            <p style="font-size:18px; margin:20px 0;">"But you shall receive power when the Holy Spirit has come upon you; and you shall be witnesses to Me in Jerusalem, and in all Judea and Samaria, and to the end of the earth." — Acts 1:8</p>
         </div>
-        
+
         <div class="section">
-            <div class="section-header"><h2>📅 Upcoming Events</h2></div>
-            <div id="eventsContainer" class="events-grid">Loading events...</div>
-            <div style="text-align: center; margin-top: 20px;"><a href="services.html" class="btn-small">📞 View All Events →</a></div>
+            <h2>🎧 Latest Sermons</h2>
+            <div id="sermonsContainer" class="grid"><p class="loading">Loading sermons...</p></div>
         </div>
-        
+
         <div class="section">
-            <div class="section-header"><h2>🙌 What God Is Doing</h2></div>
-            <div id="testimoniesContainer" class="testimonials-grid">Loading testimonies...</div>
-            <div style="text-align: center; margin-top: 20px;"><a href="contact.html" class="btn-small">✍️ Share Your Testimony →</a></div>
+            <h2>📅 Upcoming Events</h2>
+            <div id="eventsContainer" class="grid"><p class="loading">Loading events...</p></div>
         </div>
-        
+
         <div class="section">
-            <div class="service-times-card">
-                <h3>📅 Weekly Service Schedule</h3>
-                <div class="service-times-list">
-                    <div class="service-time-item"><div class="service-name">🙏 Sunday Service</div><div class="service-time">10:00 AM</div></div>
-                    <div class="service-time-item"><div class="service-name">📖 Bible Study</div><div class="service-time">Wednesday 6:30 PM</div></div>
-                    <div class="service-time-item"><div class="service-name">🔥 Border Prayer</div><div class="service-time">Friday 5:00 AM</div></div>
-                    <div class="service-time-item"><div class="service-name">🚛 Truck Driver Ministry</div><div class="service-time">Thursday 3:00 PM</div></div>
-                </div>
-                <div style="margin-top: 20px;"><a href="contact.html" style="color: white; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; text-decoration: none;">📍 Get Directions →</a></div>
-            </div>
+            <h2>🙌 What God Is Doing</h2>
+            <div id="testimoniesContainer" class="grid"><p class="loading">Loading testimonies...</p></div>
         </div>
     </div>
-    
+
     <div class="footer">
         <p>&copy; 2024 Power Filled Believer's Fellowship - Chirundu, Zambia</p>
-        <p>📍 Along Chirundu Border Post | Theme: Acts 1:8 - "Witnesses to the ends of the earth"</p>
     </div>
-    
+
     <script>
-        // Initialize default data if empty
-        function initializeData() {
-            if (!localStorage.getItem('pfbf_sermons')) {
-                const defaultSermons = [
-                    { id: 1, title: "The Power of the Holy Spirit", speaker: "Pastor Michael Thompson", date: "2024-12-15", description: "Discover the transformative power of the Holy Spirit in your life", videoUrl: "", audioUrl: "", imageUrl: "" },
-                    { id: 2, title: "Witnesses to the Ends of the Earth", speaker: "Pastor Michael Thompson", date: "2024-12-08", description: "Understanding our call to be witnesses as in Acts 1:8", videoUrl: "", audioUrl: "", imageUrl: "" }
-                ];
-                localStorage.setItem('pfbf_sermons', JSON.stringify(defaultSermons));
-            }
-            if (!localStorage.getItem('pfbf_events')) {
-                const defaultEvents = [
-                    { id: 1, title: "Christmas Crusade 2024", date: "2024-12-22", time: "2:00 PM - 6:00 PM", location: "Chirundu Border", description: "Special cross-border Christmas celebration with worship, drama, and free meal distribution.", videoUrl: "", imageUrl: "" }
-                ];
-                localStorage.setItem('pfbf_events', JSON.stringify(defaultEvents));
-            }
-            if (!localStorage.getItem('pfbf_testimonies')) {
-                const defaultTestimonies = [
-                    { id: 1, name: "John B.", testimony: "I was a truck driver passing through Chirundu when I gave my life to Christ. Now I serve God at every border I cross!", imageUrl: "" }
-                ];
-                localStorage.setItem('pfbf_testimonies', JSON.stringify(defaultTestimonies));
-            }
-            if (!localStorage.getItem('pfbf_prayers')) {
-                localStorage.setItem('pfbf_prayers', JSON.stringify([]));
-            }
-        }
-        
-        function getYouTubeId(url) {
-            if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-        
-                async function loadSermons() {
+        async function loadSermons() {
             const container = document.getElementById('sermonsContainer');
-            if (!container) return;
-            
-            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading sermons from cloud...</div>';
-            
             const sermons = await loadSermonsFromCloud();
             if (!sermons || sermons.length === 0) {
-                container.innerHTML = '<p>No sermons available yet. Check back soon!</p>';
+                container.innerHTML = '<p>No sermons available yet.</p>';
                 return;
             }
-            const latestSermons = sermons.slice(0, 3);
-            container.innerHTML = latestSermons.map(s => {
-                let videoHtml = '';
-                if (s.video_url) {
-                    const videoId = getYouTubeId(s.video_url);
-                    if (videoId) {
-                        videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
-                    } else {
-                        videoHtml = `<div class="media-links"><a href="${s.video_url}" target="_blank" class="media-link">🎥 Watch Video</a></div>`;
-                    }
-                }
-                return `
-                    <div class="sermon-card">
-                        ${s.image_url ? `<img src="${s.image_url}" class="sermon-image" onerror="this.style.display='none'" alt="${s.title}">` : ''}
-                        <div class="sermon-title">${s.title}</div>
-                        <div class="sermon-speaker">${s.speaker} | ${s.date}</div>
-                        <p>${s.description || ''}</p>
-                        ${videoHtml}
-                        ${s.audio_url ? `<div class="media-links"><a href="${s.audio_url}" target="_blank" class="media-link">🎵 Listen to Audio</a></div>` : ''}
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = sermons.slice(0, 3).map(s => `
+                <div class="card">
+                    <h3>${s.title}</h3>
+                    <p><strong>${s.speaker}</strong> | ${s.date}</p>
+                    <p>${s.description || ''}</p>
+                    ${s.video_url ? `<a href="${s.video_url}" target="_blank" class="btn">🎥 Watch</a>` : ''}
+                    ${s.audio_url ? `<a href="${s.audio_url}" target="_blank" class="btn">🎵 Listen</a>` : ''}
+                </div>
+            `).join('');
         }
-        
+
         async function loadEvents() {
             const container = document.getElementById('eventsContainer');
-            if (!container) return;
-            
-            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading events from cloud...</div>';
-            
             const events = await loadEventsFromCloud();
             if (!events || events.length === 0) {
-                container.innerHTML = '<p>No upcoming events. Check back soon!</p>';
+                container.innerHTML = '<p>No upcoming events.</p>';
                 return;
             }
-            const upcomingEvents = events.slice(0, 3);
-            container.innerHTML = upcomingEvents.map(e => {
-                let videoHtml = '';
-                if (e.video_url) {
-                    const videoId = getYouTubeId(e.video_url);
-                    if (videoId) {
-                        videoHtml = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
-                    } else {
-                        videoHtml = `<div class="media-links"><a href="${e.video_url}" target="_blank" class="media-link">🎥 Watch Promo</a></div>`;
-                    }
-                }
-                return `
-                    <div class="event-card">
-                        ${e.image_url ? `<img src="${e.image_url}" class="sermon-image" onerror="this.style.display='none'" alt="${e.title}">` : ''}
-                        <div class="event-title">${e.title}</div>
-                        <div class="event-time">📅 ${e.date} | ⏰ ${e.time}</div>
-                        <div class="event-time">📍 ${e.location}</div>
-                        <p>${e.description || ''}</p>
-                        ${videoHtml}
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = events.slice(0, 3).map(e => `
+                <div class="card">
+                    <h3>${e.title}</h3>
+                    <p>📅 ${e.date} | ⏰ ${e.time}</p>
+                    <p>📍 ${e.location}</p>
+                    <p>${e.description || ''}</p>
+                    ${e.video_url ? `<a href="${e.video_url}" target="_blank" class="btn">🎥 Watch</a>` : ''}
+                </div>
+            `).join('');
         }
-        
+
         async function loadTestimonies() {
             const container = document.getElementById('testimoniesContainer');
-            if (!container) return;
-            
-            container.innerHTML = '<div style="text-align:center; padding:20px;">Loading testimonies from cloud...</div>';
-            
             const testimonies = await loadTestimoniesFromCloud();
             if (!testimonies || testimonies.length === 0) {
-                container.innerHTML = '<p>No testimonies yet. Share yours!</p>';
+                container.innerHTML = '<p>No testimonies yet.</p>';
                 return;
             }
-            const recentTestimonies = testimonies.slice(0, 3);
-            container.innerHTML = recentTestimonies.map(t => `
-                <div class="testimonial-card">
-                    ${t.image_url ? `<img src="${t.image_url}" class="testimonial-image" onerror="this.style.display='none'" alt="${t.name}">` : ''}
-                    <div class="testimonial-text">"${t.testimony}"</div>
-                    <div class="testimonial-author">- ${t.name}</div>
+            container.innerHTML = testimonies.slice(0, 3).map(t => `
+                <div class="card">
+                    <p><em>"${t.testimony}"</em></p>
+                    <p><strong>- ${t.name}</strong></p>
                 </div>
             `).join('');
         }
-            const recentTestimonies = testimonies.slice(-3).reverse();
-            container.innerHTML = recentTestimonies.map(t => `
-                <div class="testimonial-card">
-                    ${t.imageUrl ? `<img src="${t.imageUrl}" class="testimonial-image" onerror="this.style.display='none'" alt="${t.name}">` : ''}
-                    <div class="testimonial-text">"${t.testimony}"</div>
-                    <div class="testimonial-author">- ${t.name}</div>
-                </div>
-            `).join('');
-        }
-        
-        // Countdown timer
-        const services = [
-            { day: 0, hour: 10, minute: 0, name: "Sunday Service" },
-            { day: 3, hour: 18, minute: 30, name: "Wednesday Bible Study" },
-            { day: 5, hour: 5, minute: 0, name: "Friday Border Prayer" }
-        ];
-        
-        function getNextService() {
-            const now = new Date();
-            const currentDay = now.getDay();
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            let nextService = null;
-            let minDiff = Infinity;
-            for (let service of services) {
-                let serviceDate = new Date(now);
-                serviceDate.setDate(now.getDate() + ((service.day - currentDay + 7) % 7));
-                serviceDate.setHours(service.hour, service.minute, 0, 0);
-                if (service.day === currentDay) {
-                    if (currentHour > service.hour || (currentHour === service.hour && currentMinute >= service.minute)) {
-                        serviceDate.setDate(serviceDate.getDate() + 7);
-                    }
-                }
-                const diff = serviceDate - now;
-                if (diff < minDiff && diff > 0) {
-                    minDiff = diff;
-                    nextService = { date: serviceDate, name: service.name };
-                }
-            }
-            return nextService;
-        }
-        
-        function updateCountdown() {
-            const next = getNextService();
-            if (!next) return;
-            const now = new Date();
-            const diff = next.date - now;
-            if (diff <= 0) {
-                document.getElementById('nextServiceInfo').innerHTML = "🟢 " + next.name + " IS HAPPENING NOW!";
-                document.getElementById('liveStatus').innerHTML = '<div style="text-align:center; margin-top:10px;"><span class="live-badge">🔴 LIVE SERVICE IN PROGRESS</span></div>';
-                document.getElementById('days').innerHTML = '00';
-                document.getElementById('hours').innerHTML = '00';
-                document.getElementById('minutes').innerHTML = '00';
-                document.getElementById('seconds').innerHTML = '00';
-                return;
-            }
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (86400000)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (3600000)) / (1000 * 60));
-            const seconds = Math.floor((diff % (60000)) / 1000);
-            document.getElementById('nextServiceInfo').innerHTML = `Next: ${next.name} - ${next.date.toLocaleDateString()} at ${next.date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-            document.getElementById('days').innerHTML = String(days).padStart(2, '0');
-            document.getElementById('hours').innerHTML = String(hours).padStart(2, '0');
-            document.getElementById('minutes').innerHTML = String(minutes).padStart(2, '0');
-            document.getElementById('seconds').innerHTML = String(seconds).padStart(2, '0');
-            document.getElementById('liveStatus').innerHTML = '';
-        }
-        
-        // Initialize and load
-        initializeData();
+
+        // Load everything
         loadSermons();
         loadEvents();
         loadTestimonies();
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-        
-        // Refresh data every 30 seconds
-        setInterval(() => {
-            loadSermons();
-            loadEvents();
-            loadTestimonies();
-        }, 30000);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-client.js"></script>
 </body>
 </html>
-
